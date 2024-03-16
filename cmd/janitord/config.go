@@ -2,27 +2,17 @@ package main
 
 import (
 	"errors"
+	"os"
+
 	"github.com/adrg/xdg"
 	"gopkg.in/yaml.v3"
-	"log"
-	"os"
 )
 
-type Config struct {
+type config struct {
 	Motd string `yaml:"motd"`
 }
 
-var cfg *Config
-
-func init() {
-	loaded, err := loadConfig()
-	if err != nil {
-		log.Fatalf("error loading config: %s\n", err.Error())
-	}
-	cfg = loaded
-}
-
-func loadConfig() (cfg *Config, err error) {
+func loadConfig() (cfg *config, err error) {
 	path, err := xdg.ConfigFile("janitord.yaml")
 	if err != nil {
 		return nil, err
@@ -37,9 +27,9 @@ func loadConfig() (cfg *Config, err error) {
 		return nil, err
 	}
 
-	switch exists {
-	case true:
-		cfg = &Config{}
+	cfg = &config{}
+
+	if exists {
 		data, err := os.ReadFile(path)
 		if err != nil {
 			return nil, err
@@ -48,16 +38,19 @@ func loadConfig() (cfg *Config, err error) {
 		if err != nil {
 			return nil, err
 		}
-	case false:
-		cfg = &Config{Motd: "Hello, World!"}
-		data, err := yaml.Marshal(cfg)
-		if err != nil {
-			return nil, err
-		}
-		err = os.WriteFile(path, data, 0640)
-		if err != nil {
-			return nil, err
-		}
+	}
+
+	if cfg.Motd == "" {
+		cfg.Motd = "Hello, World!"
+	}
+
+	data, err := yaml.Marshal(cfg)
+	if err != nil {
+		return nil, err
+	}
+	err = os.WriteFile(path, data, 0640)
+	if err != nil {
+		return nil, err
 	}
 
 	return cfg, nil
