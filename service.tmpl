@@ -1,0 +1,41 @@
+[Unit]
+Description={{ description }}
+After=network.target
+
+[Service]
+Type=exec
+
+WorkingDirectory={{ dir }}
+ReadWritePaths={{ dir }}
+
+User={{ user }}
+Group={{ group }}
+
+# hardening
+ProtectSystem=strict
+ProtectControlGroups=yes
+PrivateDevices=yes
+ProtectHome=yes
+ProtectKernelLogs=yes
+ProtectKernelModules=yes
+ProtectKernelTunables=yes
+PrivateTmp=yes
+RemoveIPC=yes
+RestrictSUIDSGID=yes
+
+Restart=always
+
+# sleep delay prior to restart
+RestartSec=10
+
+# maximum time until startup completion is required
+TimeoutStartSec=300
+
+ExecStart={{ dir }}/start.sh
+ExecStop={{ dir }}/stop.sh
+
+[Install]
+
+# When the service starts, it should happen after the system and network are ready, that is why we declare this relation.
+# https://unix.stackexchange.com/questions/506347/why-do-most-systemd-examples-contain-wantedby-multi-user-target/506374#506374
+WantedBy=multi-user.target
