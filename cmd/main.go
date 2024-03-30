@@ -11,9 +11,19 @@ import (
 	"github.com/coreos/go-systemd/v22/dbus"
 )
 
+const usage string = `janitord - The janitor juggles services`
+
 var done = make(chan any, 1)
 
 func main() {
+
+	flag.Usage = func() {
+		log.Print(usage)
+		os.Exit(1)
+	}
+
+	flag.Parse()
+
 	cfg, err := loadConfig()
 	if err != nil {
 		logE.Fatalf("error loading config: %s\n", err.Error())
