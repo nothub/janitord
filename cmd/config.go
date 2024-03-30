@@ -4,7 +4,6 @@ import (
 	"errors"
 	"os"
 
-	"github.com/adrg/xdg"
 	"gopkg.in/yaml.v3"
 )
 
@@ -12,14 +11,9 @@ type config struct {
 	Motd string `yaml:"motd"`
 }
 
-func loadConfig() (cfg *config, err error) {
-	path, err := xdg.ConfigFile("janitord.yaml")
-	if err != nil {
-		return nil, err
-	}
-
+func loadConfig(p string) (cfg *config, err error) {
 	var exists bool
-	if _, err := os.Stat(path); err == nil {
+	if _, err := os.Stat(p); err == nil {
 		exists = true
 	} else if errors.Is(err, os.ErrNotExist) {
 		exists = false
@@ -30,7 +24,7 @@ func loadConfig() (cfg *config, err error) {
 	cfg = &config{}
 
 	if exists {
-		data, err := os.ReadFile(path)
+		data, err := os.ReadFile(p)
 		if err != nil {
 			return nil, err
 		}
@@ -48,7 +42,7 @@ func loadConfig() (cfg *config, err error) {
 	if err != nil {
 		return nil, err
 	}
-	err = os.WriteFile(path, data, 0640)
+	err = os.WriteFile(p, data, 0640)
 	if err != nil {
 		return nil, err
 	}

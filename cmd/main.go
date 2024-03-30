@@ -22,9 +22,11 @@ func main() {
 		os.Exit(1)
 	}
 
+	configPath := flag.String("config", "/etc/janitord.yaml", "")
+
 	flag.Parse()
 
-	cfg, err := loadConfig()
+	cfg, err := loadConfig(*configPath)
 	if err != nil {
 		logE.Fatalf("error loading config: %s\n", err.Error())
 	}
