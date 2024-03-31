@@ -26,7 +26,7 @@ func main() {
 
 	flag.Parse()
 
-	cfg, err := loadConfig(*configPath)
+	err := loadConfig(*configPath)
 	if err != nil {
 		logE.Fatalf("error loading config: %s\n", err.Error())
 	}
@@ -48,9 +48,28 @@ func attachDbus() {
 	}
 	defer bus.Close()
 
-	_, err = bus.ListUnitsContext(ctx)
+	sysState, err := bus.SystemStateContext(ctx)
 	if err != nil {
-		logE.Fatalf("error fetching units: %s\n", err.Error())
+		logE.Fatalf("error fetching system state: %s\n", err.Error())
+	}
+	logI.Printf("%s=%+v (%T)\n", sysState.Name, sysState.Value, sysState.Value)
+
+	unitStates, err := bus.ListUnitsContext(ctx)
+	if err != nil {
+		logE.Fatalf("error fetching unit states: %s\n", err.Error())
+	}
+	logI.Printf("found %v unit states:\n", len(unitStates))
+	for _, s := range unitStates {
+		logI.Printf("  - %s (%s) %s %s %s\n", s.Name, s.JobType, s.LoadState, s.ActiveState, s.SubState)
+	}
+
+	unitFiles, err := bus.ListUnitFilesContext(ctx)
+	if err != nil {
+		logE.Fatalf("error fetching unit files: %s\n", err.Error())
+	}
+	logI.Printf("found %v unit files:\n", len(unitStates))
+	for _, f := range unitFiles {
+		logI.Printf("  - %s %s\n", f.Type, f.Path)
 	}
 
 	// TODO: dbus event handlers
