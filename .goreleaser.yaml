@@ -1,0 +1,51 @@
+# This is a goreleaser config file. Check the docs at https://goreleaser.com
+# yaml-language-server: $schema=https://goreleaser.com/static/schema.json
+# vim: set ts=2 sw=2 tw=0 fo=cnqoj
+
+version: 1
+
+project_name: 'janitord'
+
+builds:
+  - main: './cmd/'
+    env:
+      - 'CGO_ENABLED=0'
+    tags:
+      - 'osusergo'
+      - 'netgo'
+    ldflags:
+      - '-s'
+      - '-w'
+    goos:
+      - 'linux'
+    ignore:
+      - goos: 'linux'
+        goarch: '386'
+
+upx:
+  - enabled: true
+    goos: [ 'linux' ]
+    compress: 'best'
+    lzma: true
+
+archives:
+  - meta: false
+    name_template: '{{ .ProjectName }}_{{ .Version }}_{{ .Arch }}'
+    files:
+      - 'LICENSE.txt'
+
+changelog:
+  sort: 'asc'
+
+checksum:
+  name_template: 'checksums.txt'
+  algorithm: 'sha256'
+
+release:
+  github:
+    owner: 'nothub'
+    name: 'janitord'
+  name_template: 'v{{ .Version }}'
+  header: 'Release generated at commit: {{ .ShortCommit }}'
+  draft: true
+  replace_existing_draft: true
