@@ -4,6 +4,10 @@ The janitor juggles services
 
 ---
 
+👷 **WiP** 🧑‍🏭
+
+---
+
 The janitor enables a pleasant workflow for managing multiple containerized services on a single machine.
 
 The janitor watches a [Git](https://git-scm.com/) repository full of [Compose](https://compose-spec.io/) files.
