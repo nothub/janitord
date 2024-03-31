@@ -8,14 +8,18 @@ import (
 )
 
 type config struct {
-	Motd string `yaml:"motd"`
+	Motd  string `yaml:"motd"`
+	User  string `yaml:"user"`
+	Group string `yaml:"group"`
 }
 
 var cfg config
 
-func loadConfig(p string) (err error) {
+var cfgPath string
+
+func loadConfig() (err error) {
 	var exists bool
-	if _, err := os.Stat(p); err == nil {
+	if _, err := os.Stat(cfgPath); err == nil {
 		exists = true
 	} else if errors.Is(err, os.ErrNotExist) {
 		exists = false
@@ -26,7 +30,7 @@ func loadConfig(p string) (err error) {
 	cfg = config{}
 
 	if exists {
-		data, err := os.ReadFile(p)
+		data, err := os.ReadFile(cfgPath)
 		if err != nil {
 			return err
 		}
@@ -44,7 +48,7 @@ func loadConfig(p string) (err error) {
 	if err != nil {
 		return err
 	}
-	err = os.WriteFile(p, data, 0640)
+	err = os.WriteFile(cfgPath, data, 0640)
 	if err != nil {
 		return err
 	}

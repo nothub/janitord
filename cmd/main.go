@@ -22,11 +22,11 @@ func main() {
 		os.Exit(1)
 	}
 
-	configPath := flag.String("config", "/etc/janitord.yaml", "")
+	flag.StringVar(&cfgPath, "config", "/etc/janitord.yaml", "")
 
 	flag.Parse()
 
-	err := loadConfig(*configPath)
+	err := loadConfig()
 	if err != nil {
 		logE.Fatalf("error loading config: %s\n", err.Error())
 	}
@@ -86,7 +86,10 @@ func handleSignals() {
 		case sig := <-signals:
 			switch sig {
 			case syscall.SIGHUP:
-				// TODO: reload config
+				err := loadConfig()
+				if err != nil {
+					logE.Fatalf("error loading config: %s\n", err.Error())
+				}
 			case syscall.SIGINT:
 				fallthrough
 			case syscall.SIGTERM:
